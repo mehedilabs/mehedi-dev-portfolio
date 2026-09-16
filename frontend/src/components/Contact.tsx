@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
+import {
+  FiArrowUpRight,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiSend,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
+
 import {
-  FaEnvelope,
-  FaGithub,
-  FaLinkedin,
-  FaWhatsapp,
-} from "react-icons/fa";
-import {
-  type ContactData,
   sendContactMessage,
+  type ContactData,
 } from "../services/contactService";
 
 const Contact = () => {
@@ -20,14 +22,16 @@ const Contact = () => {
     message: "",
   });
 
-  const [loading, setLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -36,9 +40,9 @@ const Contact = () => {
   ) => {
     e.preventDefault();
 
-    try {
-      setLoading(true);
+    setIsSending(true);
 
+    try {
       await sendContactMessage(formData);
 
       toast.success("Message sent successfully!");
@@ -57,159 +61,235 @@ const Contact = () => {
 
       toast.error(message);
     } finally {
-      setLoading(false);
+      setIsSending(false);
     }
   };
 
   return (
-    <section id="contact" className="px-4 py-24">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-12 text-center">
-          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-500">
-            Get In Touch
+    <section
+      id="contact"
+      className="relative overflow-hidden py-24"
+    >
+      <div className="pointer-events-none absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-violet-500/10 blur-[150px]" />
+
+      <div className="section-container">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.3em] text-gray-500">
+            Get in touch
           </p>
 
-          <h2 className="text-4xl font-bold sm:text-5xl">
-            Let's{" "}
-            <span className="gradient-text">Connect</span>
+          <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
+            Let's Work{" "}
+            <span className="gradient-text">Together</span>
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-gray-400">
-            Have a project idea or want to work together? Send me a
-            message.
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-500">
+            Have a project, idea or opportunity? Feel free to send
+            me a message.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-8 lg:grid-cols-5">
+        <div className="mt-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          {/* Contact Information */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="rounded-2xl border border-white/10 bg-white/5 p-7 lg:col-span-2"
+            transition={{ duration: 0.6 }}
+            className="space-y-4"
           >
-            <h3 className="text-2xl font-bold">
-              Contact Information
-            </h3>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
+              <h3 className="text-xl font-bold text-white">
+                Let's connect
+              </h3>
 
-            <div className="mt-8 space-y-6">
-              <div className="flex gap-4">
-                <FaEnvelope className="mt-1 text-xl" />
+              <p className="mt-3 text-sm leading-7 text-gray-500">
+                I'm always open to discussing new projects,
+                opportunities and ideas.
+              </p>
 
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="mt-1">
-                    mehedi.hasan.bd.dev@gmail.com
-                  </p>
-                </div>
-              </div>
+              <div className="mt-7 space-y-4">
+                <a
+                  href="mailto:mehedi.hasan.bd.dev@gmail.com"
+                  className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition duration-300 hover:bg-white/[0.06]"
+                >
+                  <span className="rounded-lg bg-white/5 p-2.5 text-gray-300">
+                    <FiMail />
+                  </span>
 
-              <div className="flex gap-4">
-                <FaWhatsapp className="mt-1 text-xl" />
+                  <div>
+                    <p className="text-xs text-gray-600">
+                      Email
+                    </p>
 
-                <div>
-                  <p className="text-sm text-gray-500">WhatsApp</p>
-                  <p className="mt-1">01877168787</p>
-                </div>
-              </div>
+                    <p className="mt-1 text-sm text-gray-300">
+                      mehedi.hasan.bd.dev@gmail.com
+                    </p>
+                  </div>
+                </a>
 
-              <div className="flex gap-4">
-                <div className="mt-1 h-5 w-5 rounded-full border border-white/30" />
+                <a
+                  href="tel:01877168787"
+                  className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4 transition duration-300 hover:bg-white/[0.06]"
+                >
+                  <span className="rounded-lg bg-white/5 p-2.5 text-gray-300">
+                    <FiPhone />
+                  </span>
 
-                <div>
-                  <p className="text-sm text-gray-500">Location</p>
-                  <p className="mt-1">Bangladesh</p>
+                  <div>
+                    <p className="text-xs text-gray-600">
+                      Phone
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-300">
+                      01877168787
+                    </p>
+                  </div>
+                </a>
+
+                <div className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <span className="rounded-lg bg-white/5 p-2.5 text-gray-300">
+                    <FiMapPin />
+                  </span>
+
+                  <div>
+                    <p className="text-xs text-gray-600">
+                      Location
+                    </p>
+
+                    <p className="mt-1 text-sm text-gray-300">
+                      Bangladesh
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-10 flex gap-3">
-              <a
-                href="https://github.com/mehedilabs"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
-              >
-                <FaGithub />
-              </a>
+            <a
+              href="https://github.com/mehedilabs"
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.025] p-5 transition duration-300 hover:border-white/20 hover:bg-white/[0.05]"
+            >
+              <div>
+                <p className="text-xs text-gray-600">
+                  Find me on GitHub
+                </p>
 
-              <a
-                href="https://www.linkedin.com/in/mehedilabs/"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
-              >
-                <FaLinkedin />
-              </a>
+                <p className="mt-1 text-sm font-medium text-gray-300">
+                  github.com/mehedilabs
+                </p>
+              </div>
 
-              <a
-                href="https://wa.me/8801877168787"
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
-              >
-                <FaWhatsapp />
-              </a>
-            </div>
+              <FiArrowUpRight className="text-gray-500 transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-white" />
+            </a>
           </motion.div>
 
+          {/* Contact Form */}
           <motion.form
-            initial={{ opacity: 0, x: 30 }}
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, x: 25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            onSubmit={handleSubmit}
-            className="rounded-2xl border border-white/10 bg-white/5 p-7 lg:col-span-3"
+            transition={{ duration: 0.6 }}
+            className="rounded-2xl border border-white/10 bg-white/[0.025] p-6 sm:p-8"
           >
-            <div className="grid gap-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
-                />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-2 block text-xs font-medium text-gray-400"
+                >
+                  Name
+                </label>
 
                 <input
-                  type="email"
-                  name="email"
-                  placeholder="Your Email"
-                  value={formData.email}
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
                   onChange={handleChange}
+                  placeholder="Your name"
                   required
-                  className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-700 focus:border-white/25"
                 />
               </div>
 
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-2 block text-xs font-medium text-gray-400"
+                >
+                  Email
+                </label>
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  required
+                  className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-700 focus:border-white/25"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <label
+                htmlFor="subject"
+                className="mb-2 block text-xs font-medium text-gray-400"
+              >
+                Subject
+              </label>
+
               <input
-                type="text"
+                id="subject"
                 name="subject"
-                placeholder="Subject"
+                type="text"
                 value={formData.subject}
                 onChange={handleChange}
+                placeholder="What would you like to discuss?"
                 required
-                className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
+                className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-700 focus:border-white/25"
               />
+            </div>
+
+            <div className="mt-5">
+              <label
+                htmlFor="message"
+                className="mb-2 block text-xs font-medium text-gray-400"
+              >
+                Message
+              </label>
 
               <textarea
+                id="message"
                 name="message"
-                placeholder="Your Message"
                 value={formData.message}
                 onChange={handleChange}
+                placeholder="Write your message..."
                 required
                 rows={7}
-                className="resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
+                className="w-full resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-700 focus:border-white/25"
               />
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? "Sending..." : "Send Message"}
-              </button>
             </div>
+
+            <button
+              type="submit"
+              disabled={isSending}
+              className="group mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-black transition duration-300 hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSending ? "Sending..." : "Send Message"}
+
+              <FiSend className="transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
           </motion.form>
         </div>
       </div>

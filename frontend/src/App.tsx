@@ -10,6 +10,8 @@ import Projects from "./components/Projects";
 import Experience from "./components/Experience";
 import Education from "./components/Education";
 import Achievements from "./components/Achievements";
+import Contact from "./components/Contact";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -25,18 +27,9 @@ function App() {
         <Experience />
         <Education />
         <Achievements />
-       
-
-        <section
-          id="contact"
-          className="flex min-h-screen items-center justify-center"
-        >
-          <h2 className="text-4xl font-bold">
-            Contact
-          </h2>
-        </section>
+        <Contact />
       </main>
-
+        <Footer/>
       <ToastContainer
         position="bottom-right"
         theme="dark"
