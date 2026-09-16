@@ -13,7 +13,20 @@ import Achievements from "./components/Achievements";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
 function App() {
+  const currentPath = window.location.pathname;
+
+  if (currentPath === "/admin/dashboard") {
+    return <AdminDashboard />;
+  }
+
+  if (currentPath === "/admin") {
+    return <AdminLogin />;
+  }
+
   return (
     <div className="min-h-screen bg-transparent text-white">
       <Navbar />
@@ -29,7 +42,9 @@ function App() {
         <Achievements />
         <Contact />
       </main>
-        <Footer/>
+
+      <Footer />
+
       <ToastContainer
         position="bottom-right"
         theme="dark"
