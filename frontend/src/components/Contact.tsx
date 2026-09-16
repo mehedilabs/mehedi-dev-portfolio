@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import {
   FaEnvelope,
@@ -7,7 +8,7 @@ import {
   FaWhatsapp,
 } from "react-icons/fa";
 import {
-  ContactData,
+  type ContactData,
   sendContactMessage,
 } from "../services/contactService";
 
@@ -30,7 +31,9 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
     try {
@@ -59,14 +62,14 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="bg-black px-4 py-20 text-white">
-      <div className="mx-auto max-w-6xl">
+    <section id="contact" className="px-4 py-24">
+      <div className="mx-auto max-w-7xl">
         <div className="mb-12 text-center">
-          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-400">
+          <p className="mb-3 text-sm uppercase tracking-[0.3em] text-gray-500">
             Get In Touch
           </p>
 
-          <h2 className="text-4xl font-bold md:text-5xl">
+          <h2 className="text-4xl font-bold sm:text-5xl">
             Let's{" "}
             <span className="gradient-text">Connect</span>
           </h2>
@@ -77,41 +80,54 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h3 className="mb-6 text-2xl font-semibold">
+        <div className="grid gap-8 lg:grid-cols-5">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-white/10 bg-white/5 p-7 lg:col-span-2"
+          >
+            <h3 className="text-2xl font-bold">
               Contact Information
             </h3>
 
-            <div className="space-y-5">
-              <div className="flex items-center gap-4">
-                <FaEnvelope className="text-xl" />
+            <div className="mt-8 space-y-6">
+              <div className="flex gap-4">
+                <FaEnvelope className="mt-1 text-xl" />
+
                 <div>
-                  <p className="text-sm text-gray-400">Email</p>
-                  <p>{`mehedi.hasan.bd.dev@gmail.com`}</p>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="mt-1">
+                    mehedi.hasan.bd.dev@gmail.com
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                <FaWhatsapp className="text-xl" />
+              <div className="flex gap-4">
+                <FaWhatsapp className="mt-1 text-xl" />
+
                 <div>
-                  <p className="text-sm text-gray-400">WhatsApp</p>
-                  <p>01877168787</p>
+                  <p className="text-sm text-gray-500">WhatsApp</p>
+                  <p className="mt-1">01877168787</p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm text-gray-400">Location</p>
-                <p>Bangladesh</p>
+              <div className="flex gap-4">
+                <div className="mt-1 h-5 w-5 rounded-full border border-white/30" />
+
+                <div>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <p className="mt-1">Bangladesh</p>
+                </div>
               </div>
             </div>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-10 flex gap-3">
               <a
                 href="https://github.com/mehedilabs"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 transition hover:bg-white/10"
+                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
               >
                 <FaGithub />
               </a>
@@ -120,7 +136,7 @@ const Contact = () => {
                 href="https://www.linkedin.com/in/mehedilabs/"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 transition hover:bg-white/10"
+                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
               >
                 <FaLinkedin />
               </a>
@@ -129,37 +145,42 @@ const Contact = () => {
                 href="https://wa.me/8801877168787"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-lg border border-white/10 p-3 transition hover:bg-white/10"
+                className="rounded-lg border border-white/10 p-3 text-gray-400 transition hover:bg-white/10 hover:text-white"
               >
                 <FaWhatsapp />
               </a>
             </div>
-          </div>
+          </motion.div>
 
-          <form
+          <motion.form
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
             onSubmit={handleSubmit}
-            className="rounded-2xl border border-white/10 bg-white/5 p-6"
+            className="rounded-2xl border border-white/10 bg-white/5 p-7 lg:col-span-3"
           >
             <div className="grid gap-5">
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none focus:border-white/30"
-              />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
+                />
 
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none focus:border-white/30"
-              />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
+                />
+              </div>
 
               <input
                 type="text"
@@ -168,7 +189,7 @@ const Contact = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 required
-                className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none focus:border-white/30"
+                className="rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
               />
 
               <textarea
@@ -177,19 +198,19 @@ const Contact = () => {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                rows={6}
-                className="w-full resize-none rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none focus:border-white/30"
+                rows={7}
+                className="resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-white/30"
               />
 
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-lg bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? "Sending..." : "Send Message"}
               </button>
             </div>
-          </form>
+          </motion.form>
         </div>
       </div>
     </section>

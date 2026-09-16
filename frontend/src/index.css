@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 
 @import "tailwindcss";
 
@@ -12,9 +12,37 @@ html {
 
 body {
   margin: 0;
-  font-family: "Inter", sans-serif;
+  min-width: 320px;
   background: #050505;
   color: #ffffff;
+  font-family: "Inter", sans-serif;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  z-index: -1;
+  width: 600px;
+  height: 600px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(120, 80, 255, 0.08);
+  filter: blur(120px);
+  pointer-events: none;
 }
 
 button,
@@ -25,4 +53,31 @@ a {
 ::selection {
   background: #ffffff;
   color: #000000;
+}
+
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #a78bfa 45%,
+    #60a5fa 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.section-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 640px) {
+  .section-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
