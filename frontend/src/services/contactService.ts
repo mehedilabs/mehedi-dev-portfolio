@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5000/api/contact";
+const API_URL =
+  "https://mehedi-dev-portfolio-d3ql-qtbabkujc-mehedilabs.vercel.app/api/contact";
 
 export interface ContactData {
   name: string;
