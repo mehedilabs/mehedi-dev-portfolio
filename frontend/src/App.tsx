@@ -8,6 +8,8 @@ import About from "./components/About";
 import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Experience from "./components/Experience";
+import Education from "./components/Education";
+import Achievements from "./components/Achievements";
 
 function App() {
   return (
@@ -21,24 +23,9 @@ function App() {
         <Skills />
         <Projects />
         <Experience />
-
-        <section
-          id="education"
-          className="flex min-h-screen items-center justify-center"
-        >
-          <h2 className="text-4xl font-bold">
-            Education
-          </h2>
-        </section>
-
-        <section
-          id="achievements"
-          className="flex min-h-screen items-center justify-center"
-        >
-          <h2 className="text-4xl font-bold">
-            Achievements
-          </h2>
-        </section>
+        <Education />
+        <Achievements />
+       
 
         <section
           id="contact"
