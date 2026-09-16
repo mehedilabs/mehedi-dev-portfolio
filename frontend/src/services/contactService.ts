@@ -1,5 +1,5 @@
 const API_URL =
-  "https://mehedi-dev-portfolio-d3ql-qtbabkujc-mehedilabs.vercel.app/api/contact";
+  "https://mehedi-dev-portfolio-d3ql.vercel.app/api/contact";
 
 export interface ContactData {
   name: string;
@@ -8,9 +8,7 @@ export interface ContactData {
   message: string;
 }
 
-export const sendContactMessage = async (
-  contactData: ContactData,
-) => {
+export const sendContactMessage = async (contactData: ContactData) => {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
