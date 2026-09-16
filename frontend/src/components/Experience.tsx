@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FiBriefcase, FiCode, FiArrowUpRight } from "react-icons/fi";
+import { FiBriefcase, FiCode } from "react-icons/fi";
 
 const Experience = () => {
   return (
