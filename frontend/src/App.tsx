@@ -15,9 +15,14 @@ import Footer from "./components/Footer";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProfile from "./pages/admin/AdminProfile";
 
 function App() {
   const currentPath = window.location.pathname;
+
+  if (currentPath === "/admin/profile") {
+    return <AdminProfile />;
+  }
 
   if (currentPath === "/admin/dashboard") {
     return <AdminDashboard />;

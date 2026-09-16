@@ -155,6 +155,19 @@ const AdminDashboard = () => {
               {menuItems.map((item) => {
                 const Icon = item.icon;
 
+                if (item.name === "Profile") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/profile"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
                 return (
                   <button
                     key={item.name}
@@ -225,6 +238,19 @@ const AdminDashboard = () => {
               <div className="flex min-w-max gap-2">
                 {menuItems.map((item) => {
                   const Icon = item.icon;
+
+                  if (item.name === "Profile") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/profile"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
 
                   return (
                     <button
@@ -306,9 +332,10 @@ const AdminDashboard = () => {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <button
-                  type="button"
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                {/* Edit Profile */}
+                <a
+                  href="/admin/profile"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
                 >
                   <FiUser size={20} />
 
@@ -319,8 +346,9 @@ const AdminDashboard = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     Update your basic information
                   </p>
-                </button>
+                </a>
 
+                {/* Add Project */}
                 <button
                   type="button"
                   className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
@@ -336,6 +364,7 @@ const AdminDashboard = () => {
                   </p>
                 </button>
 
+                {/* Manage Skills */}
                 <button
                   type="button"
                   className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
@@ -351,6 +380,7 @@ const AdminDashboard = () => {
                   </p>
                 </button>
 
+                {/* View Messages */}
                 <button
                   type="button"
                   className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
