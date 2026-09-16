@@ -5,9 +5,17 @@ import {
   FaLinkedin,
   FaWhatsapp,
 } from "react-icons/fa";
-import { FiArrowDown, FiArrowUpRight, FiMapPin } from "react-icons/fi";
+import {
+  FiArrowDown,
+  FiArrowUpRight,
+  FiMapPin,
+} from "react-icons/fi";
 
-import { greetings, profile, stats } from "../data/portfolioData";
+import {
+  greetings,
+  profile,
+  stats,
+} from "../data/portfolioData";
 
 const Hero = () => {
   const [greetingIndex, setGreetingIndex] = useState(0);
@@ -59,9 +67,10 @@ const Hero = () => {
             </motion.p>
 
             {/* Name */}
-            <h1 className="max-w-4xl text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-              I'm{" "}
-              <span className="gradient-text">
+            <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+              <span className="block">I'm</span>
+
+              <span className="block gradient-text">
                 {profile.name}
               </span>
             </h1>
@@ -91,6 +100,7 @@ const Hero = () => {
                 className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black transition duration-300 hover:scale-105"
               >
                 View My Work
+
                 <FiArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
               </a>
 
@@ -187,6 +197,7 @@ const Hero = () => {
                     <p className="text-xl font-bold text-white">
                       {stat.value}
                     </p>
+
                     <p className="mt-1 text-[10px] uppercase tracking-wider text-gray-500">
                       {stat.label}
                     </p>
@@ -209,7 +220,7 @@ const Hero = () => {
 
                 <div>
                   <p className="text-xs font-semibold text-white">
-                    {profile.availability
+                    {profile.available
                       ? "Available"
                       : "Currently busy"}
                   </p>

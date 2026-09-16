@@ -13,7 +13,7 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/mehedilabs/",
   whatsapp: "https://wa.me/8801877168787",
 
-  profileImage: "",
+  profileImage: "/src/assets/profile.png",
   resume: "#",
 };
 
