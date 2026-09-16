@@ -256,6 +256,7 @@ const Contact = () => {
                 value={formData.subject}
                 onChange={handleChange}
                 placeholder="What would you like to discuss?"
+                required
                 className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-700 focus:border-white/25"
               />
             </div>
