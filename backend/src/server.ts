@@ -47,10 +47,6 @@ app.use("/api/skills", skillRoutes);
 app.use("/api/experiences", experienceRoutes);
 app.use("/api/achievements", achievementRoutes);
 
-const PORT = process.env.PORT || 5000;
-
 connectDB();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+export default app;
