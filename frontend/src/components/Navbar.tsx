@@ -51,7 +51,7 @@ const Navbar = () => {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-5">
         <a
           href="#home"
-          className="text-xl font-extrabold tracking-tight"
+          className="gradient-text text-xl font-extrabold tracking-tight"
         >
           Mehedi<span className="gradient-text">.</span>
         </a>
@@ -97,8 +97,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="border-t border-white/10 bg-black/95 px-4 py-5 backdrop-blur-xl md:hidden">
-          <div className="flex flex-col gap-2">
+  <div className="absolute right-4 top-16 w-36 rounded-2xl border border-white/10 bg-black/10 p-2 shadow-2xl backdrop-blur-xl md:hidden">
+          <div className="flex flex-col gap-1">
             {links.map((link) => {
               const isActive = activeSection === link.id;
 

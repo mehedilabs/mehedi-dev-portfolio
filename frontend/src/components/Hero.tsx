@@ -17,8 +17,13 @@ import {
   stats,
 } from "../data/portfolioData";
 
+import API_URL from "../config/api";
+
 const Hero = () => {
   const [greetingIndex, setGreetingIndex] = useState(0);
+  const [projectCount, setProjectCount] = useState(0);
+  const [experience, setExperience] = useState("00");
+  const [clients, setClients] = useState("00");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -28,6 +33,35 @@ const Hero = () => {
     }, 2200);
 
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [projectResponse, statsResponse] =
+          await Promise.all([
+            fetch(`${API_URL}/projects/count`),
+            fetch(`${API_URL}/stats`),
+          ]);
+
+        if (projectResponse.ok) {
+          const projectData = await projectResponse.json();
+
+          setProjectCount(projectData.count);
+        }
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+
+          setExperience(statsData.experience);
+          setClients(statsData.clients);
+        }
+      } catch (error) {
+        console.error("Portfolio stats error:", error);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   return (
@@ -97,7 +131,7 @@ const Hero = () => {
             <div className="mt-9 flex flex-wrap gap-4">
               <a
                 href="#projects"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black transition duration-300 hover:scale-105"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black  hover:bg-[#b2effa] transition duration-300 hover:scale-105"
               >
                 View My Work
 
@@ -195,7 +229,13 @@ const Hero = () => {
                 {stats.map((stat) => (
                   <div key={stat.label} className="text-center">
                     <p className="text-xl font-bold text-white">
-                      {stat.value}
+                      {stat.label === "Projects"
+                        ? `${projectCount}+`
+                        : stat.label === "Experience"
+                          ? experience
+                          : stat.label === "Clients"
+                            ? clients
+                            : stat.value}
                     </p>
 
                     <p className="mt-1 text-[10px] uppercase tracking-wider text-gray-500">
@@ -235,7 +275,7 @@ const Hero = () => {
             {/* Resume card */}
             <a
               href={profile.resume}
-              className="absolute -bottom-5 -right-3 hidden rounded-full border border-white/10 bg-white px-5 py-3 text-xs font-bold text-black shadow-xl transition duration-300 hover:scale-105 sm:block"
+              className="absolute -bottom-5 -right-3 hidden rounded-full  hover:bg-[#b2effa] border border-white/10 bg-white px-5 py-3 text-xs font-bold text-black shadow-xl transition duration-300 hover:scale-105 sm:block"
             >
               Resume <FiArrowUpRight className="ml-1 inline" />
             </a>

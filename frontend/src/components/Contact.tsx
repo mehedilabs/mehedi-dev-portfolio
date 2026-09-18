@@ -79,7 +79,7 @@ const Contact = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.3em] text-gray-500">
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.3em]  text-cyan-400/80">
             Get in touch
           </p>
 

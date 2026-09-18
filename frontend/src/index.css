@@ -59,9 +59,10 @@ a {
   background: linear-gradient(
     90deg,
     #ffffff 0%,
-    #a78bfa 45%,
-    #60a5fa 100%
+    #45b6c5 50%,
+    #72d0dc 100%
   );
+
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

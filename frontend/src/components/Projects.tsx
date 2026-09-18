@@ -1,178 +1,244 @@
-import { motion } from "framer-motion";
-import { FiExternalLink, FiGithub } from "react-icons/fi";
+import { useEffect, useState } from "react";
 
-const projects = [
-  {
-    id: "dev-stack-builder",
-    title: "Dev Stack Builder",
-    description:
-      "A modern web application for exploring technologies and building a personalized development stack.",
-    image: "",
-    technologies: [
-      "React",
-      "TypeScript",
-      "Tailwind CSS",
-      "DaisyUI",
-    ],
-    liveLink: "https://graceful-dango-9c33c9.netlify.app/",
-    githubLink: "https://github.com/mehedilabs/B14-A5-DevStack",
-  },
-  {
-    id: "world-cup-ticket-hub",
-    title: "World Cup Ticket Hub",
-    description:
-      "A responsive ticket booking website designed with a clean interface and interactive user experience.",
-    image: "",
-    technologies: ["React", "JavaScript", "Tailwind CSS"],
-    liveLink: "#",
-    githubLink: "#",
-  },
-  {
-    id: "special-login-page",
-    title: "Special Login Page",
-    description:
-      "A responsive login interface created to practice modern layout, form design and frontend styling.",
-    image: "",
-    technologies: ["HTML", "CSS", "JavaScript"],
-    liveLink: "#",
-    githubLink: "#",
-  },
-  {
-    id: "coming-soon",
-    title: "Coming Soon",
-    description:
-      "A new project will be added here as I continue building and exploring modern web development.",
-    image: "",
-    technologies: ["Coming Soon"],
-    liveLink: "#",
-    githubLink: "#",
-  },
-];
+import { motion } from "framer-motion";
+import {
+  FiArrowUpRight,
+  FiCode,
+  FiGithub,
+  FiLayers,
+} from "react-icons/fi";
+
+import API_URL from "../config/api";
+
+type Project = {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  technologies: string[];
+  liveUrl: string;
+  githubUrl: string;
+  featured: boolean;
+};
+
+
 
 const Projects = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(`${API_URL}/projects`);
+
+        if (!response.ok) {
+          throw new Error("Failed to load projects");
+        }
+
+        const data = await response.json();
+
+        setProjects(data);
+      } catch (error) {
+        console.error("Load projects error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  const featuredProjects = projects.filter(
+    (project) => project.featured,
+  );
+
   return (
     <section
       id="projects"
-      className="relative overflow-hidden py-24"
+      className="relative overflow-hidden py-24 sm:py-28"
     >
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/10 blur-[150px]" />
+      {/* Background Glow */}
+      <div className="pointer-events-none absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-blue-500/[0.035] blur-[130px]" />
 
-      <div className="section-container">
+      <div className="pointer-events-none absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-cyan-500/[0.03] blur-[120px]" />
+
+      {/* Subtle Grid */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.018]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+          backgroundSize: "50px 50px",
+        }}
+      />
+
+      {/* Left Indicator */}
+      <div className="pointer-events-none absolute left-6 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-3 lg:flex">
+        <span className="h-1.5 w-1.5 rounded-full bg-gray-700" />
+
+        <span className="h-12 w-px bg-cyan-400/60" />
+
+        <span className="h-1.5 w-1.5 rounded-full bg-gray-700" />
+      </div>
+
+      <div className="section-container relative">
+        {/* Heading */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.55 }}
         >
-          <p className="mb-2 text-xs font-medium uppercase tracking-[0.3em] text-gray-500">
-            Selected work
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-400/80">
+              Selected Work
+            </p>
 
-          <h2 className="text-4xl font-black tracking-tight sm:text-5xl">
-            My{" "}
-            <span className="gradient-text">Projects</span>
-          </h2>
+          </div>
 
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-500">
-            A collection of projects I've built while learning,
-            practicing and exploring modern web development.
+          <div className="mt-4 flex items-center gap-3">
+            <span className="font-mono text-2xl text-cyan-400/70 sm:text-3xl">
+              {"{ }"}
+            </span>
+
+            <h2 className="gradient-text text-4xl font-bold tracking-tight text-white sm:text-5xl">
+              Projects
+            </h2>
+          </div>
+
+          <p className="mt-4 max-w-xl text-sm leading-7 text-gray-500 sm:text-base">
+            A collection of things I have built, explored, and learned from.
           </p>
         </motion.div>
 
-        <div className="mt-12 space-y-6">
-          {projects.map((project, index) => (
-            <motion.article
-              key={project.id}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.6,
-                delay: index * 0.1,
-              }}
-              className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025] transition duration-500 hover:border-white/20 hover:bg-white/[0.04]"
-            >
-              <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-                <div className="relative flex min-h-64 items-center justify-center overflow-hidden border-b border-white/10 bg-[#0b0b0d] lg:min-h-[320px] lg:border-b-0 lg:border-r">
-                  {project.image ? (
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <p className="text-7xl font-black text-white/5">
-                        0{index + 1}
-                      </p>
+        {/* Projects */}
+        {loading ? (
+          <div className="mt-12 text-sm text-gray-600">
+            Loading projects...
+          </div>
+        ) : featuredProjects.length === 0 ? (
+          <div className="mt-12 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-10 text-center">
+            <FiLayers
+              size={24}
+              className="mx-auto mb-3 text-gray-600"
+            />
 
-                      <p className="mt-2 text-xs text-gray-700">
-                        Project preview
-                      </p>
+            <p className="text-sm text-gray-500">
+              Projects will be added soon.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-12 space-y-5">
+            {featuredProjects.map((project, index) => (
+              <motion.article
+                key={project._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.5,
+                  delay: index * 0.08,
+                }}
+                className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#08111d]/75 backdrop-blur-md transition duration-300 hover:border-cyan-400/20"
+              >
+                <div className="grid lg:grid-cols-[0.95fr_1.05fr]">
+                  {/* Project Preview */}
+                  <div className="relative min-h-[260px] overflow-hidden border-b border-white/[0.07] bg-[#0b1725] lg:min-h-[330px] lg:border-b-0 lg:border-r">
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-[1.03] group-hover:opacity-90"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative flex h-24 w-24 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.025] text-gray-600">
+                          <FiCode size={34} />
+
+                          <span className="absolute -right-2 -top-2 h-3 w-3 rounded-full bg-cyan-400/70 shadow-[0_0_12px_rgba(34,211,238,0.5)]" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Preview Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#06101c] via-transparent to-transparent" />
+
+                    {/* Project Number */}
+                    <div className="absolute left-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-black/20 font-mono text-[10px] text-gray-400 backdrop-blur-sm">
+                      {String(index + 1).padStart(2, "0")}
                     </div>
-                  )}
-
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                </div>
-
-                <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="mb-2 font-mono text-xs uppercase tracking-widest text-gray-600">
-                        Project 0{index + 1}
-                      </p>
-
-                      <h3 className="text-2xl font-bold text-white sm:text-3xl">
-                        {project.title}
-                      </h3>
-                    </div>
-
-                    <span className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-gray-600 sm:block">
-                      {index === 0 ? "Featured" : "Project"}
-                    </span>
                   </div>
 
-                  <p className="mt-5 max-w-2xl text-sm leading-7 text-gray-500 sm:text-base">
-                    {project.description}
-                  </p>
-
-                  <div className="mt-6 flex flex-wrap gap-2">
-                    {project.technologies.map((technology) => (
-                      <span
-                        key={technology}
-                        className="rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-[11px] text-gray-400 transition duration-300 hover:border-white/20 hover:bg-white/5 hover:text-white"
-                      >
-                        {technology}
+                  {/* Project Content */}
+                  <div className="flex flex-col justify-center p-6 sm:p-8 lg:p-10">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-400/70">
+                        Featured Project
                       </span>
-                    ))}
-                  </div>
 
-                  <div className="mt-7 flex flex-wrap items-center gap-3">
-                    <a
-                      href={project.liveLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="group/link inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-xs font-semibold text-black transition duration-300 hover:scale-105"
-                    >
-                      Live Preview
-                      <FiExternalLink className="transition-transform duration-300 group-hover/link:-translate-y-0.5" />
-                    </a>
+                      <FiLayers
+                        size={15}
+                        className="text-gray-600"
+                      />
+                    </div>
 
-                    <a
-                      href={project.githubLink}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-semibold text-gray-300 transition duration-300 hover:border-white/20 hover:bg-white/10 hover:text-white"
-                    >
-                      <FiGithub />
-                      Code
-                    </a>
+                    <h3 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                      {project.title}
+                    </h3>
+
+                    <p className="mt-4 max-w-xl text-sm leading-7 text-gray-500">
+                      {project.description}
+                    </p>
+
+                    {/* Technologies */}
+                    {project.technologies.length > 0 && (
+                      <div className="mt-6 flex flex-wrap gap-2">
+                        {project.technologies.map(
+                          (technology, technologyIndex) => (
+                            <span
+                              key={`${technology}-${technologyIndex}`}
+                              className="rounded-md border border-white/[0.08] bg-white/[0.025] px-2.5 py-1.5 text-[10px] font-medium text-gray-400"
+                            >
+                              {technology}
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    )}
+
+                    {/* Links */}
+                    <div className="mt-7 flex flex-wrap items-center gap-3">
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-semibold text-gray-900 transition hover:bg-cyan-400"
+                        >
+                          Live Preview
+                          <FiArrowUpRight size={14} />
+                        </a>
+                      )}
+
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2.5 text-xs font-semibold text-gray-300 transition hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+                        >
+                          <FiGithub size={14} />
+                          Source Code
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
+              </motion.article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

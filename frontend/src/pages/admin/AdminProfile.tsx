@@ -3,6 +3,8 @@ import { FiSave } from "react-icons/fi";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import API_URL from "../../config/api";
+
 interface ProfileData {
   name: string;
   jobTitle: string;
@@ -43,13 +45,15 @@ const AdminProfile = () => {
     const loadProfile = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/profile",
+          `${API_URL}/profile`,
         );
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Failed to load profile");
+          throw new Error(
+            data.message || "Failed to load profile",
+          );
         }
 
         setProfile(data);
@@ -105,7 +109,7 @@ const AdminProfile = () => {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/profile",
+        `${API_URL}/profile`,
         {
           method: "PUT",
           headers: {
@@ -119,7 +123,9 @@ const AdminProfile = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Profile update failed");
+        throw new Error(
+          data.message || "Profile update failed",
+        );
       }
 
       setProfile(data.profile);
@@ -141,6 +147,7 @@ const AdminProfile = () => {
       <main className="flex min-h-screen items-center justify-center bg-[#050505] text-white">
         <div className="text-center">
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+
           <p className="mt-4 text-sm text-gray-500">
             Loading profile...
           </p>
@@ -162,7 +169,8 @@ const AdminProfile = () => {
           </h1>
 
           <p className="mt-2 text-sm text-gray-500">
-            Update the information displayed across your portfolio.
+            Update the information displayed across your
+            portfolio.
           </p>
         </div>
 

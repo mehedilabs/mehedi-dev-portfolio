@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   FiAward,
   FiBookOpen,
@@ -8,12 +9,21 @@ import {
   FiHome,
   FiLogOut,
   FiMail,
+  FiSave,
   FiSettings,
   FiUser,
 } from "react-icons/fi";
 
+import API_URL from "../../config/api";
+
 const AdminDashboard = () => {
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [projectCount, setProjectCount] = useState(0);
+  const [achievementCount, setAchievementCount] = useState(0);
+
+  const [experience, setExperience] = useState("00");
+  const [clients, setClients] = useState("00");
+  const [savingStats, setSavingStats] = useState(false);
 
   useEffect(() => {
     const checkAuthentication = async () => {
@@ -25,20 +35,50 @@ const AdminDashboard = () => {
       }
 
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/admin/dashboard",
-          {
+        const [
+          authResponse,
+          projectResponse,
+          achievementResponse,
+          statsResponse,
+        ] = await Promise.all([
+          fetch(`${API_URL}/admin/dashboard`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          },
-        );
+          }),
 
-        if (!response.ok) {
+          fetch(`${API_URL}/projects/count`),
+
+          fetch(`${API_URL}/achievements`),
+
+          fetch(`${API_URL}/stats`),
+        ]);
+
+        if (!authResponse.ok) {
           localStorage.removeItem("adminToken");
           window.location.href = "/admin";
           return;
+        }
+
+        if (projectResponse.ok) {
+          const projectData = await projectResponse.json();
+
+          setProjectCount(projectData.count);
+        }
+
+        if (achievementResponse.ok) {
+          const achievementData =
+            await achievementResponse.json();
+
+          setAchievementCount(achievementData.length);
+        }
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+
+          setExperience(statsData.experience);
+          setClients(statsData.clients);
         }
 
         setCheckingAuth(false);
@@ -56,6 +96,54 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     window.location.href = "/admin";
+  };
+
+  const handleSaveStats = async () => {
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      toast.error("Please login again");
+      return;
+    }
+
+    try {
+      setSavingStats(true);
+
+      const response = await fetch(`${API_URL}/stats`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          experience,
+          clients,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to update stats",
+        );
+      }
+
+      setExperience(data.stats.experience);
+      setClients(data.stats.clients);
+
+      toast.success("Stats updated successfully!");
+    } catch (error) {
+      console.error("Update stats error:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update stats",
+      );
+    } finally {
+      setSavingStats(false);
+    }
   };
 
   const menuItems = [
@@ -101,7 +189,7 @@ const AdminDashboard = () => {
   const stats = [
     {
       title: "Projects",
-      value: "0",
+      value: projectCount.toString(),
       icon: FiFolder,
     },
     {
@@ -116,7 +204,7 @@ const AdminDashboard = () => {
     },
     {
       title: "Achievements",
-      value: "0",
+      value: achievementCount.toString(),
       icon: FiAward,
     },
   ];
@@ -160,6 +248,84 @@ const AdminDashboard = () => {
                     <a
                       key={item.name}
                       href="/admin/profile"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "About") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/about"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "Skills") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/skills"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "Projects") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/projects"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "Experience") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/experience"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "Education") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/education"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
+                if (item.name === "Achievements") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/achievements"
                       className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
                     >
                       <Icon size={18} />
@@ -252,6 +418,84 @@ const AdminDashboard = () => {
                     );
                   }
 
+                  if (item.name === "About") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/about"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Skills") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/skills"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Projects") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/projects"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Experience") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/experience"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Education") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/education"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Achievements") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/achievements"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
                   return (
                     <button
                       key={item.name}
@@ -302,6 +546,82 @@ const AdminDashboard = () => {
               </div>
             </section>
 
+            {/* Stats Management */}
+            <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-6">
+              <div className="mb-6">
+                <p className="text-sm font-medium text-gray-400">
+                  Portfolio Stats
+                </p>
+
+                <h3 className="mt-2 text-xl font-semibold">
+                  Manage Experience & Clients
+                </h3>
+
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
+                  Update the numbers shown in your public portfolio.
+                  Projects are calculated automatically from your
+                  Projects database.
+                </p>
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                {/* Experience */}
+                <div>
+                  <label className="mb-2 block text-sm text-gray-400">
+                    Experience
+                  </label>
+
+                  <input
+                    type="text"
+                    value={experience}
+                    onChange={(event) =>
+                      setExperience(event.target.value)
+                    }
+                    placeholder="00"
+                    className="admin-input"
+                  />
+
+                  <p className="mt-2 text-xs text-gray-600">
+                    Example: 1+, 2+, 3+
+                  </p>
+                </div>
+
+                {/* Clients */}
+                <div>
+                  <label className="mb-2 block text-sm text-gray-400">
+                    Clients
+                  </label>
+
+                  <input
+                    type="text"
+                    value={clients}
+                    onChange={(event) =>
+                      setClients(event.target.value)
+                    }
+                    placeholder="00"
+                    className="admin-input"
+                  />
+
+                  <p className="mt-2 text-xs text-gray-600">
+                    Example: 5+, 10+, 20+
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleSaveStats}
+                  disabled={savingStats}
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <FiSave size={17} />
+
+                  {savingStats ? "Saving..." : "Save Stats"}
+                </button>
+              </div>
+            </section>
+
             {/* Welcome */}
             <section className="mt-6 rounded-xl border border-white/10 bg-white/[0.03] p-6">
               <p className="text-sm font-medium text-gray-400">
@@ -331,7 +651,7 @@ const AdminDashboard = () => {
                 </p>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
                 {/* Edit Profile */}
                 <a
                   href="/admin/profile"
@@ -349,9 +669,9 @@ const AdminDashboard = () => {
                 </a>
 
                 {/* Add Project */}
-                <button
-                  type="button"
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                <a
+                  href="/admin/projects"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
                 >
                   <FiFolder size={20} />
 
@@ -362,12 +682,12 @@ const AdminDashboard = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     Add a new portfolio project
                   </p>
-                </button>
+                </a>
 
                 {/* Manage Skills */}
-                <button
-                  type="button"
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                <a
+                  href="/admin/skills"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
                 >
                   <FiCode size={20} />
 
@@ -378,7 +698,58 @@ const AdminDashboard = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     Add or update your skills
                   </p>
-                </button>
+                </a>
+
+                {/* Manage Experience */}
+                <a
+                  href="/admin/experience"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-cyan-400/20 hover:bg-white/[0.05]"
+                >
+                  <FiBriefcase
+                    size={20}
+                    className="text-cyan-400"
+                  />
+
+                  <h4 className="mt-4 font-medium">
+                    Manage Experience
+                  </h4>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    Add or update your experience
+                  </p>
+                </a>
+
+                {/* Manage Education */}
+                <a
+                  href="/admin/education"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                >
+                  <FiBookOpen size={20} />
+
+                  <h4 className="mt-4 font-medium">
+                    Manage Education
+                  </h4>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    Add or update your education
+                  </p>
+                </a>
+
+                {/* Manage Achievements */}
+                <a
+                  href="/admin/achievements"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                >
+                  <FiAward size={20} />
+
+                  <h4 className="mt-4 font-medium">
+                    Manage Achievements
+                  </h4>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    Add or update your achievements
+                  </p>
+                </a>
 
                 {/* View Messages */}
                 <button
