@@ -3,6 +3,15 @@ import { Resend } from "resend";
 
 import Contact from "../models/Contact.js";
 
+const escapeHtml = (value: string) => {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 const isValidEmail = (email: string) => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
@@ -226,6 +235,9 @@ export const replyToContact = async (
       });
     }
 
+    const safeName = escapeHtml(contact.name);
+    const safeMessage = escapeHtml(trimmedMessage);
+
     const resend = new Resend(
       process.env.RESEND_API_KEY,
     );
@@ -237,9 +249,9 @@ export const replyToContact = async (
       replyTo: process.env.RESEND_FROM_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">
-          <p>Hi ${contact.name},</p>
+          <p>Hi ${safeName},</p>
 
-          <p>${trimmedMessage.replace(/\n/g, "<br />")}</p>
+          <p>${safeMessage.replace(/\n/g, "<br />")}</p>
 
           <hr style="border: 0; border-top: 1px solid #ddd; margin: 24px 0;" />
 
@@ -282,4 +294,3 @@ export const replyToContact = async (
     });
   }
 };
-
