@@ -31,8 +31,6 @@ type EducationForm = {
   order: number;
 };
 
-
-
 const emptyForm: EducationForm = {
   degree: "",
   institution: "",
@@ -50,8 +48,6 @@ const AdminEducation = () => {
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const token = localStorage.getItem("adminToken");
-
   const fetchEducation = async () => {
     try {
       const response = await fetch(
@@ -59,10 +55,16 @@ const AdminEducation = () => {
         {
           method: "GET",
           cache: "no-store",
+          credentials: "include",
         },
       );
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error("Failed to load education");
       }
 
@@ -106,11 +108,6 @@ const AdminEducation = () => {
   };
 
   const handleSubmit = async () => {
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     if (
       !form.degree.trim() ||
       !form.institution.trim() ||
@@ -136,8 +133,8 @@ const AdminEducation = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(form),
       });
 
@@ -146,6 +143,11 @@ const AdminEducation = () => {
       console.log("Education save response:", data);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message ||
             `Failed to ${
@@ -197,11 +199,6 @@ const AdminEducation = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this education?",
     );
@@ -215,9 +212,7 @@ const AdminEducation = () => {
         `${API_URL}/education/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
 
@@ -226,6 +221,11 @@ const AdminEducation = () => {
       console.log("Education delete response:", data);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message || "Failed to delete education",
         );

@@ -24,8 +24,6 @@ type ProjectForm = {
   featured: boolean;
 };
 
-
-
 const emptyForm: ProjectForm = {
   title: "",
   description: "",
@@ -44,12 +42,24 @@ const AdminProjects = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const token = localStorage.getItem("adminToken");
+  const redirectToLogin = () => {
+    window.location.replace("/admin");
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch(`${API_URL}/projects`);
+        const response = await fetch(
+          `${API_URL}/projects`,
+          {
+            credentials: "include",
+          },
+        );
+
+        if (response.status === 401) {
+          redirectToLogin();
+          return;
+        }
 
         if (!response.ok) {
           throw new Error("Failed to load projects");
@@ -66,7 +76,7 @@ const AdminProjects = () => {
       }
     };
 
-    fetchProjects();
+    void fetchProjects();
   }, []);
 
   const handleChange = (
@@ -89,11 +99,6 @@ const AdminProjects = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
-
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
 
     if (!form.title.trim() || !form.description.trim()) {
       toast.error("Title and description are required");
@@ -126,10 +131,15 @@ const AdminProjects = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(projectData),
       });
+
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
 
       const data = await response.json();
 
@@ -193,11 +203,6 @@ const AdminProjects = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this project?",
     );
@@ -211,11 +216,14 @@ const AdminProjects = () => {
         `${API_URL}/projects/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
+
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
 
       const data = await response.json();
 
@@ -226,7 +234,9 @@ const AdminProjects = () => {
       }
 
       setProjects((previous) =>
-        previous.filter((project) => project._id !== id),
+        previous.filter(
+          (project) => project._id !== id,
+        ),
       );
 
       if (editingId === id) {
@@ -282,7 +292,9 @@ const AdminProjects = () => {
         >
           <div className="mb-6">
             <h2 className="text-xl font-semibold">
-              {editingId ? "Edit Project" : "Add New Project"}
+              {editingId
+                ? "Edit Project"
+                : "Add New Project"}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
@@ -494,7 +506,9 @@ const AdminProjects = () => {
                   <div className="mt-5 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      onClick={() => handleEdit(project)}
+                      onClick={() =>
+                        handleEdit(project)
+                      }
                       className="rounded-lg border border-white/10 px-4 py-2 text-xs font-medium text-gray-300 transition hover:bg-white/5"
                     >
                       Edit

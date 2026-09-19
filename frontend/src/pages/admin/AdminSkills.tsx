@@ -22,8 +22,6 @@ type Skill = {
   items: SkillItem[];
 };
 
-
-
 const AdminSkills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,12 +34,25 @@ const AdminSkills = () => {
     },
   ]);
 
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(
+    null,
+  );
   const [saving, setSaving] = useState(false);
+
+  const redirectToLogin = () => {
+    window.location.replace("/admin");
+  };
 
   const fetchSkills = async () => {
     try {
-      const response = await fetch(`${API_URL}/skills`);
+      const response = await fetch(`${API_URL}/skills`, {
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to load skills");
@@ -60,33 +71,8 @@ const AdminSkills = () => {
   };
 
   useEffect(() => {
-  const token = localStorage.getItem("adminToken");
-
-  if (!token) {
-    window.location.href = "/admin";
-    return;
-  }
-
-  const loadSkills = async () => {
-    try {
-      const response = await fetch(`${API_URL}/skills`);
-
-      if (!response.ok) {
-        throw new Error("Failed to load skills");
-      }
-
-      const data = await response.json();
-      setSkills(data);
-    } catch (error) {
-      console.error("Load skills error:", error);
-      toast.error("Failed to load skills");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  void loadSkills();
-}, []);
+    void fetchSkills();
+  }, []);
 
   const resetForm = () => {
     setCategory("");
@@ -142,13 +128,6 @@ const AdminSkills = () => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     if (!category.trim()) {
       toast.error("Category is required");
       return;
@@ -159,10 +138,14 @@ const AdminSkills = () => {
         name: item.name.trim(),
         logoUrl: item.logoUrl.trim(),
       }))
-      .filter((item) => item.name && item.logoUrl);
+      .filter(
+        (item) => item.name && item.logoUrl,
+      );
 
     if (validItems.length === 0) {
-      toast.error("Add at least one skill with name and logo URL");
+      toast.error(
+        "Add at least one skill with name and logo URL",
+      );
       return;
     }
 
@@ -186,19 +169,25 @@ const AdminSkills = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           category: category.trim(),
           items: validItems,
         }),
       });
 
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to save skill category",
+          data.message ||
+            "Failed to save skill category",
         );
       }
 
@@ -209,7 +198,7 @@ const AdminSkills = () => {
       );
 
       resetForm();
-      fetchSkills();
+      void fetchSkills();
     } catch (error) {
       console.error("Save skill error:", error);
 
@@ -248,13 +237,6 @@ const AdminSkills = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this skill category?",
     );
@@ -264,24 +246,33 @@ const AdminSkills = () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/skills/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${API_URL}/skills/${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
         },
-      });
+      );
+
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to delete skill category",
+          data.message ||
+            "Failed to delete skill category",
         );
       }
 
-      toast.success("Skill category deleted successfully!");
+      toast.success(
+        "Skill category deleted successfully!",
+      );
 
-      fetchSkills();
+      void fetchSkills();
     } catch (error) {
       console.error("Delete skill error:", error);
 
@@ -382,7 +373,9 @@ const AdminSkills = () => {
 
                 <span className="text-xs text-gray-600">
                   {items.length}{" "}
-                  {items.length === 1 ? "skill" : "skills"}
+                  {items.length === 1
+                    ? "skill"
+                    : "skills"}
                 </span>
               </div>
 
@@ -394,7 +387,11 @@ const AdminSkills = () => {
                   >
                     <div className="mb-4 flex items-center justify-between">
                       <p className="text-xs font-medium uppercase tracking-wider text-gray-600">
-                        Skill {String(index + 1).padStart(2, "0")}
+                        Skill{" "}
+                        {String(index + 1).padStart(
+                          2,
+                          "0",
+                        )}
                       </p>
 
                       <button
@@ -455,6 +452,7 @@ const AdminSkills = () => {
 
                     <div className="mt-3 flex items-center gap-2 text-xs text-gray-600">
                       <FiImage size={14} />
+
                       <span>
                         Use a direct PNG, JPG or SVG image URL.
                       </span>
@@ -534,7 +532,10 @@ const AdminSkills = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-gray-600">
-                          {String(index + 1).padStart(2, "0")}
+                          {String(index + 1).padStart(
+                            2,
+                            "0",
+                          )}
                         </span>
 
                         <h3 className="font-semibold">
@@ -543,35 +544,39 @@ const AdminSkills = () => {
                       </div>
 
                       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                        {skill.items.map((item, itemIndex) => (
-                          <div
-                            key={`${item.name}-${itemIndex}`}
-                            className="flex min-h-28 flex-col items-center justify-center rounded-xl border border-white/10 bg-black/20 p-4 text-center"
-                          >
-                            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-white/5">
-                              <img
-                                src={item.logoUrl}
-                                alt={item.name}
-                                className="h-7 w-7 object-contain"
-                                onError={(event) => {
-                                  event.currentTarget.style.display =
-                                    "none";
-                                }}
-                              />
-                            </div>
+                        {skill.items.map(
+                          (item, itemIndex) => (
+                            <div
+                              key={`${item.name}-${itemIndex}`}
+                              className="flex min-h-28 flex-col items-center justify-center rounded-xl border border-white/10 bg-black/20 p-4 text-center"
+                            >
+                              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-white/5">
+                                <img
+                                  src={item.logoUrl}
+                                  alt={item.name}
+                                  className="h-7 w-7 object-contain"
+                                  onError={(event) => {
+                                    event.currentTarget.style.display =
+                                      "none";
+                                  }}
+                                />
+                              </div>
 
-                            <p className="mt-3 text-xs text-gray-400">
-                              {item.name}
-                            </p>
-                          </div>
-                        ))}
+                              <p className="mt-3 text-xs text-gray-400">
+                                {item.name}
+                              </p>
+                            </div>
+                          ),
+                        )}
                       </div>
                     </div>
 
                     <div className="flex shrink-0 gap-2">
                       <button
                         type="button"
-                        onClick={() => handleEdit(skill)}
+                        onClick={() =>
+                          handleEdit(skill)
+                        }
                         className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-gray-400 transition hover:bg-white/5 hover:text-white"
                       >
                         <FiEdit2 />

@@ -43,8 +43,6 @@ type FormData = {
   order: number;
 };
 
-
-
 const emptyForm: FormData = {
   role: "",
   company: "",
@@ -71,13 +69,21 @@ const AdminExperience = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const token = localStorage.getItem("adminToken");
-
   const fetchExperiences = async () => {
     try {
-      const response = await fetch(`${API_URL}/experiences`);
+      const response = await fetch(
+        `${API_URL}/experiences`,
+        {
+          credentials: "include",
+        },
+      );
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error("Failed to load experiences");
       }
 
@@ -149,13 +155,10 @@ const AdminExperience = () => {
     }));
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (
+    event: React.FormEvent,
+  ) => {
     event.preventDefault();
-
-    if (!token) {
-      toast.error("Admin login required");
-      return;
-    }
 
     if (!form.role.trim() || !form.company.trim()) {
       toast.error("Role and company are required");
@@ -188,15 +191,22 @@ const AdminExperience = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(cleanedData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong");
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
+        throw new Error(
+          data.message || "Something went wrong",
+        );
       }
 
       toast.success(
@@ -208,7 +218,7 @@ const AdminExperience = () => {
       setForm(emptyForm);
       setEditingId(null);
 
-      fetchExperiences();
+      await fetchExperiences();
     } catch (error) {
       console.error("Save experience error:", error);
 
@@ -260,11 +270,6 @@ const AdminExperience = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) {
-      toast.error("Admin login required");
-      return;
-    }
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this experience?",
     );
@@ -278,21 +283,28 @@ const AdminExperience = () => {
         `${API_URL}/experiences/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to delete");
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
+        throw new Error(
+          data.message || "Failed to delete",
+        );
       }
 
-      toast.success("Experience deleted successfully");
+      toast.success(
+        "Experience deleted successfully",
+      );
 
-      fetchExperiences();
+      await fetchExperiences();
     } catch (error) {
       console.error("Delete experience error:", error);
 

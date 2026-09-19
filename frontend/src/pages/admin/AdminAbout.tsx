@@ -23,8 +23,6 @@ type AboutData = {
   whatIBring: WhatIBringItem[];
 };
 
-
-
 const emptyAbout: AboutData = {
   sectionLabel: "",
   title: "",
@@ -45,19 +43,17 @@ const AdminAbout = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const token = localStorage.getItem("adminToken");
-
   useEffect(() => {
-    if (!token) {
-      window.location.href = "/admin";
-      return;
-    }
-
     const fetchAbout = async () => {
       try {
         const response = await fetch(`${API_URL}/about`);
 
         if (!response.ok) {
+          if (response.status === 401) {
+            window.location.href = "/admin";
+            return;
+          }
+
           throw new Error("Failed to load about content");
         }
 
@@ -85,7 +81,7 @@ const AdminAbout = () => {
     };
 
     fetchAbout();
-  }, [token]);
+  }, []);
 
   const updateField = (
     field: keyof AboutData,
@@ -191,11 +187,6 @@ const AdminAbout = () => {
   };
 
   const handleSave = async () => {
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     try {
       setSaving(true);
 
@@ -203,14 +194,19 @@ const AdminAbout = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(about),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message || "Failed to update About content",
         );

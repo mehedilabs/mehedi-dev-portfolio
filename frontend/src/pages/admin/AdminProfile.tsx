@@ -98,13 +98,6 @@ const AdminProfile = () => {
   ) => {
     event.preventDefault();
 
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      window.location.href = "/admin";
-      return;
-    }
-
     try {
       setSaving(true);
 
@@ -114,8 +107,8 @@ const AdminProfile = () => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify(profile),
         },
       );
@@ -123,6 +116,11 @@ const AdminProfile = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message || "Profile update failed",
         );

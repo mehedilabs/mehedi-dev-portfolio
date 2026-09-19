@@ -4,6 +4,15 @@ import jwt from "jsonwebtoken";
 
 import Admin from "../models/Admin.js";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite:
+    process.env.NODE_ENV === "production"
+      ? ("none" as const)
+      : ("lax" as const),
+};
+
 export const loginAdmin = async (
   req: Request,
   res: Response,
@@ -52,17 +61,40 @@ export const loginAdmin = async (
       { expiresIn: "1d" },
     );
 
-    res.status(200).json({
-      message: "Login successful",
+    res.cookie(
+      "adminToken",
       token,
+      cookieOptions,
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
     });
   } catch (error) {
     console.error("Admin login failed:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Something went wrong",
     });
   }
+};
+
+export const logoutAdmin = (
+  _req: Request,
+  res: Response,
+) => {
+  res.clearCookie("adminToken", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite:
+      process.env.NODE_ENV === "production"
+        ? ("none" as const)
+        : ("lax" as const),
+  });
+
+  return res.status(200).json({
+    message: "Logout successful",
+  });
 };
 
 interface AuthenticatedRequest extends Request {
@@ -90,7 +122,7 @@ export const getCurrentAdmin = async (
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       admin: {
         id: admin._id,
         email: admin.email,
@@ -99,7 +131,7 @@ export const getCurrentAdmin = async (
   } catch (error) {
     console.error("Failed to verify admin:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       message: "Something went wrong",
     });
   }

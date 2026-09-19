@@ -44,10 +44,6 @@ const AdminMessages = () => {
   const [sendingReply, setSendingReply] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const getToken = () => {
-    return localStorage.getItem("adminToken");
-  };
-
   const redirectToLogin = () => {
     window.location.replace("/admin");
   };
@@ -62,22 +58,15 @@ const AdminMessages = () => {
   };
 
   const fetchMessages = async () => {
-    const token = getToken();
-
-    if (!token) {
-      redirectToLogin();
-      return;
-    }
-
     try {
-      const response = await fetch(`${API_URL}/contact`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${API_URL}/contact`,
+        {
+          credentials: "include",
         },
-      });
+      );
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
         redirectToLogin();
         return;
       }
@@ -99,7 +88,10 @@ const AdminMessages = () => {
 
       setMessages(normalizedMessages);
     } catch (error) {
-      console.error("Failed to load messages:", error);
+      console.error(
+        "Failed to load messages:",
+        error,
+      );
 
       toast.error(
         error instanceof Error
@@ -119,27 +111,17 @@ const AdminMessages = () => {
       return;
     }
 
-    const token = getToken();
-
-    if (!token) {
-      redirectToLogin();
-      return;
-    }
-
     try {
       setLoadingConversation(true);
 
       const response = await fetch(
         `${API_URL}/contact/${id}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
         redirectToLogin();
         return;
       }
@@ -148,7 +130,8 @@ const AdminMessages = () => {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to load conversation",
+          data.message ||
+            "Failed to load conversation",
         );
       }
 
@@ -172,12 +155,18 @@ const AdminMessages = () => {
       );
 
       if (data.status === "unread") {
-        await fetch(`${API_URL}/contact/${id}/read`, {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const readResponse = await fetch(
+          `${API_URL}/contact/${id}/read`,
+          {
+            method: "PATCH",
+            credentials: "include",
           },
-        });
+        );
+
+        if (readResponse.status === 401) {
+          redirectToLogin();
+          return;
+        }
       }
     } catch (error) {
       console.error(
@@ -196,9 +185,7 @@ const AdminMessages = () => {
   };
 
   const handleReply = async () => {
-    const token = getToken();
-
-    if (!token || !selectedMessage) {
+    if (!selectedMessage) {
       return;
     }
 
@@ -223,8 +210,8 @@ const AdminMessages = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
           body: JSON.stringify({
             message: trimmedReply,
           }),
@@ -232,7 +219,6 @@ const AdminMessages = () => {
       );
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
         redirectToLogin();
         return;
       }
@@ -277,9 +263,7 @@ const AdminMessages = () => {
   };
 
   const handleDelete = async () => {
-    const token = getToken();
-
-    if (!token || !selectedMessage) {
+    if (!selectedMessage) {
       return;
     }
 
@@ -298,14 +282,11 @@ const AdminMessages = () => {
         `${API_URL}/contact/${selectedMessage._id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
 
       if (response.status === 401) {
-        localStorage.removeItem("adminToken");
         redirectToLogin();
         return;
       }
@@ -314,13 +295,15 @@ const AdminMessages = () => {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to delete message",
+          data.message ||
+            "Failed to delete message",
         );
       }
 
       setMessages((currentMessages) =>
         currentMessages.filter(
-          (item) => item._id !== selectedMessage._id,
+          (item) =>
+            item._id !== selectedMessage._id,
         ),
       );
 
@@ -467,13 +450,15 @@ const AdminMessages = () => {
               ) : (
                 messages.map((message) => {
                   const isSelected =
-                    selectedMessage?._id === message._id;
+                    selectedMessage?._id ===
+                    message._id;
 
                   const replies = message.replies ?? [];
 
                   const latestMessage =
                     replies.length > 0
-                      ? replies[replies.length - 1].message
+                      ? replies[replies.length - 1]
+                          .message
                       : message.message;
 
                   return (
@@ -481,7 +466,9 @@ const AdminMessages = () => {
                       key={message._id}
                       type="button"
                       onClick={() =>
-                        openConversation(message._id)
+                        openConversation(
+                          message._id,
+                        )
                       }
                       className={`group relative w-full border-b border-white/[0.05] px-5 py-4 text-left transition ${
                         isSelected
@@ -684,8 +671,10 @@ const AdminMessages = () => {
                           Loading conversation...
                         </p>
                       </div>
-                    ) : (selectedMessage.replies
-                          ?.length ?? 0) === 0 ? (
+                    ) : (
+                      (selectedMessage.replies
+                        ?.length ?? 0) === 0
+                    ) ? (
                       <div className="flex justify-center py-2">
                         <p className="rounded-full border border-white/[0.05] bg-white/[0.02] px-4 py-2 text-[10px] text-gray-700">
                           No replies yet

@@ -11,25 +11,25 @@ const authMiddleware = (
   next: NextFunction,
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.adminToken;
 
-    if (!authHeader) {
+    if (!token) {
       return res.status(401).json({
-        message: "Access denied. No token provided.",
+        message: "Access denied. Authentication required.",
       });
     }
 
-    const [scheme, token] = authHeader.split(" ");
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is missing");
 
-    if (scheme !== "Bearer" || !token) {
-      return res.status(401).json({
-        message: "Access denied. Invalid token.",
+      return res.status(500).json({
+        message: "Authentication service is not configured",
       });
     }
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string,
+      process.env.JWT_SECRET,
     ) as { adminId?: string };
 
     if (!decoded.adminId) {

@@ -27,13 +27,6 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const token = localStorage.getItem("adminToken");
-
-      if (!token) {
-        window.location.href = "/admin";
-        return;
-      }
-
       try {
         const [
           authResponse,
@@ -43,9 +36,7 @@ const AdminDashboard = () => {
         ] = await Promise.all([
           fetch(`${API_URL}/admin/dashboard`, {
             method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
           }),
 
           fetch(`${API_URL}/projects/count`),
@@ -56,7 +47,6 @@ const AdminDashboard = () => {
         ]);
 
         if (!authResponse.ok) {
-          localStorage.removeItem("adminToken");
           window.location.href = "/admin";
           return;
         }
@@ -85,7 +75,6 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error("Authentication check failed:", error);
 
-        localStorage.removeItem("adminToken");
         window.location.href = "/admin";
       }
     };
@@ -93,19 +82,20 @@ const AdminDashboard = () => {
     checkAuthentication();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    window.location.href = "/admin";
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      window.location.href = "/admin";
+    }
   };
 
   const handleSaveStats = async () => {
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      toast.error("Please login again");
-      return;
-    }
-
     try {
       setSavingStats(true);
 
@@ -113,8 +103,8 @@ const AdminDashboard = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({
           experience,
           clients,

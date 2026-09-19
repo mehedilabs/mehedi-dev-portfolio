@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import API_URL from "../../config/api";
-const AdminLogin = () => {
-  
 
+import API_URL from "../../config/api";
+
+const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,6 +25,7 @@ const AdminLogin = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             email,
             password,
@@ -38,13 +39,13 @@ const AdminLogin = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      localStorage.setItem("adminToken", data.token);
+      sessionStorage.setItem("adminSession", "true");
 
       toast.success("Login successful!");
 
-     setTimeout(() => {
-  window.location.href = "/admin/dashboard";
-}, 500);
+      setTimeout(() => {
+        window.location.href = "/admin/dashboard";
+      }, 500);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -79,7 +80,9 @@ const AdminLogin = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
                 placeholder="Enter admin email"
                 className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-white/30"
                 required
@@ -94,7 +97,9 @@ const AdminLogin = () => {
               <input
                 type="password"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
                 placeholder="Enter password"
                 className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-white/30"
                 required

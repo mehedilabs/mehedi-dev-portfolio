@@ -27,7 +27,6 @@ type FormData = {
   order: number;
 };
 
-
 const emptyForm: FormData = {
   title: "",
   organization: "",
@@ -40,21 +39,31 @@ const emptyForm: FormData = {
 };
 
 const AdminAchievements = () => {
-  const [achievements, setAchievements] = useState<Achievement[]>(
-    [],
-  );
+  const [achievements, setAchievements] = useState<
+    Achievement[]
+  >([]);
   const [form, setForm] = useState<FormData>(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const token = localStorage.getItem("adminToken");
-
   const fetchAchievements = async () => {
     try {
-      const response = await fetch(`${API_URL}/achievements`);
+      const response = await fetch(
+        `${API_URL}/achievements`,
+        {
+          credentials: "include",
+        },
+      );
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error("Failed to load achievements");
       }
 
@@ -62,7 +71,11 @@ const AdminAchievements = () => {
 
       setAchievements(data);
     } catch (error) {
-      console.error("Load achievements error:", error);
+      console.error(
+        "Load achievements error:",
+        error,
+      );
+
       toast.error("Failed to load achievements");
     } finally {
       setLoading(false);
@@ -88,11 +101,6 @@ const AdminAchievements = () => {
   ) => {
     event.preventDefault();
 
-    if (!token) {
-      toast.error("Admin login required");
-      return;
-    }
-
     if (!form.title.trim()) {
       toast.error("Achievement title is required");
       return;
@@ -111,14 +119,19 @@ const AdminAchievements = () => {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(form),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message || "Something went wrong",
         );
@@ -133,9 +146,12 @@ const AdminAchievements = () => {
       setForm(emptyForm);
       setEditingId(null);
 
-      fetchAchievements();
+      await fetchAchievements();
     } catch (error) {
-      console.error("Save achievement error:", error);
+      console.error(
+        "Save achievement error:",
+        error,
+      );
 
       toast.error(
         error instanceof Error
@@ -147,7 +163,9 @@ const AdminAchievements = () => {
     }
   };
 
-  const handleEdit = (achievement: Achievement) => {
+  const handleEdit = (
+    achievement: Achievement,
+  ) => {
     setEditingId(achievement._id);
 
     setForm({
@@ -168,11 +186,6 @@ const AdminAchievements = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token) {
-      toast.error("Admin login required");
-      return;
-    }
-
     const confirmed = window.confirm(
       "Are you sure you want to delete this achievement?",
     );
@@ -186,15 +199,18 @@ const AdminAchievements = () => {
         `${API_URL}/achievements/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: "include",
         },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/admin";
+          return;
+        }
+
         throw new Error(
           data.message || "Failed to delete",
         );
@@ -204,9 +220,12 @@ const AdminAchievements = () => {
         "Achievement deleted successfully",
       );
 
-      fetchAchievements();
+      await fetchAchievements();
     } catch (error) {
-      console.error("Delete achievement error:", error);
+      console.error(
+        "Delete achievement error:",
+        error,
+      );
 
       toast.error(
         error instanceof Error

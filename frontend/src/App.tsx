@@ -34,33 +34,34 @@ function App() {
     currentPath.startsWith("/admin/") &&
     currentPath !== "/admin";
 
-  const [authChecking, setAuthChecking] = useState(isAdminRoute);
+  const hasAdminSession =
+    sessionStorage.getItem("adminSession") === "true";
+
+  const [authChecking, setAuthChecking] = useState(
+    isAdminRoute,
+  );
 
   useEffect(() => {
     if (!isAdminRoute) {
       return;
     }
 
+    if (!hasAdminSession) {
+      window.location.replace("/admin");
+      return;
+    }
+
     const verifyAdmin = async () => {
-      const token = localStorage.getItem("adminToken");
-
-      if (!token) {
-        window.location.replace("/admin");
-        return;
-      }
-
       try {
         const response = await fetch(
           `${API_URL}/auth/me`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            credentials: "include",
           },
         );
 
         if (!response.ok) {
-          localStorage.removeItem("adminToken");
+          sessionStorage.removeItem("adminSession");
           window.location.replace("/admin");
           return;
         }
@@ -72,13 +73,13 @@ function App() {
           error,
         );
 
-        localStorage.removeItem("adminToken");
+        sessionStorage.removeItem("adminSession");
         window.location.replace("/admin");
       }
     };
 
     verifyAdmin();
-  }, [isAdminRoute]);
+  }, [isAdminRoute, hasAdminSession]);
 
   if (authChecking) {
     return (
