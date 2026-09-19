@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+
 import Project from "../models/Project.js";
 
-export const getProjects = async (_req: Request, res: Response) => {
+export const getProjects = async (
+  _req: Request,
+  res: Response,
+) => {
   try {
     const projects = await Project.find().sort({
       createdAt: -1,
@@ -63,6 +68,12 @@ export const updateProject = async (
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid project ID",
+      });
+    }
+
     const project = await Project.findByIdAndUpdate(
       id,
       req.body,
@@ -97,6 +108,12 @@ export const deleteProject = async (
 ) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid project ID",
+      });
+    }
 
     const project = await Project.findByIdAndDelete(id);
 

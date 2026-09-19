@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+
 import Skill from "../models/Skill.js";
 
 export const getSkills = async (
@@ -47,6 +49,12 @@ export const updateSkill = async (
   try {
     const { id } = req.params;
 
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid skill category ID",
+      });
+    }
+
     const skill = await Skill.findByIdAndUpdate(
       id,
       req.body,
@@ -81,6 +89,12 @@ export const deleteSkill = async (
 ) => {
   try {
     const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid skill category ID",
+      });
+    }
 
     const skill = await Skill.findByIdAndDelete(id);
 

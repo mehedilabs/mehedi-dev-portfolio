@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+
 import Experience from "../models/Experience.js";
 
 export const getExperiences = async (
@@ -26,7 +28,15 @@ export const getExperienceById = async (
   res: Response,
 ) => {
   try {
-    const experience = await Experience.findById(req.params.id);
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid experience ID",
+      });
+    }
+
+    const experience = await Experience.findById(id);
 
     if (!experience) {
       return res.status(404).json({
@@ -66,8 +76,16 @@ export const updateExperience = async (
   res: Response,
 ) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid experience ID",
+      });
+    }
+
     const experience = await Experience.findByIdAndUpdate(
-      req.params.id,
+      id,
       req.body,
       {
         new: true,
@@ -96,9 +114,15 @@ export const deleteExperience = async (
   res: Response,
 ) => {
   try {
-    const experience = await Experience.findByIdAndDelete(
-      req.params.id,
-    );
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid experience ID",
+      });
+    }
+
+    const experience = await Experience.findByIdAndDelete(id);
 
     if (!experience) {
       return res.status(404).json({

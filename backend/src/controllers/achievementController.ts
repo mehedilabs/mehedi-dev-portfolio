@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import mongoose from "mongoose";
+
 import Achievement from "../models/Achievement.js";
 
 export const getAchievements = async (
@@ -26,9 +28,15 @@ export const getAchievementById = async (
   res: Response,
 ) => {
   try {
-    const achievement = await Achievement.findById(
-      req.params.id,
-    );
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid achievement ID",
+      });
+    }
+
+    const achievement = await Achievement.findById(id);
 
     if (!achievement) {
       return res.status(404).json({
@@ -68,9 +76,17 @@ export const updateAchievement = async (
   res: Response,
 ) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid achievement ID",
+      });
+    }
+
     const achievement =
       await Achievement.findByIdAndUpdate(
-        req.params.id,
+        id,
         req.body,
         {
           new: true,
@@ -99,10 +115,16 @@ export const deleteAchievement = async (
   res: Response,
 ) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        message: "Invalid achievement ID",
+      });
+    }
+
     const achievement =
-      await Achievement.findByIdAndDelete(
-        req.params.id,
-      );
+      await Achievement.findByIdAndDelete(id);
 
     if (!achievement) {
       return res.status(404).json({
