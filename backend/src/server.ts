@@ -22,7 +22,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: true,
+    origin: [
+      "http://localhost:5173",
+      "https://mehedi-dev-portfolio.vercel.app",
+    ],
     credentials: true,
   }),
 );
