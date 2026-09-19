@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
+interface AuthenticatedRequest extends Request {
+  adminId?: string;
+}
+
 const authMiddleware = (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
 ) => {
@@ -15,18 +19,26 @@ const authMiddleware = (
       });
     }
 
-    const token = authHeader.split(" ")[1];
+    const [scheme, token] = authHeader.split(" ");
 
-    if (!token) {
+    if (scheme !== "Bearer" || !token) {
       return res.status(401).json({
         message: "Access denied. Invalid token.",
       });
     }
 
-    jwt.verify(
+    const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string,
-    );
+    ) as { adminId?: string };
+
+    if (!decoded.adminId) {
+      return res.status(401).json({
+        message: "Access denied. Invalid token.",
+      });
+    }
+
+    req.adminId = decoded.adminId;
 
     next();
   } catch (error) {

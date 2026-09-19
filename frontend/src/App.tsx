@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -24,8 +25,70 @@ import AdminExperience from "./pages/admin/AdminExperience";
 import AdminAchievements from "./pages/admin/AdminAchievements";
 import AdminMessages from "./pages/admin/AdminMessages";
 
+import API_URL from "./config/api";
+
 function App() {
   const currentPath = window.location.pathname;
+
+  const isAdminRoute =
+    currentPath.startsWith("/admin/") &&
+    currentPath !== "/admin";
+
+  const [authChecking, setAuthChecking] = useState(isAdminRoute);
+
+  useEffect(() => {
+    if (!isAdminRoute) {
+      return;
+    }
+
+    const verifyAdmin = async () => {
+      const token = localStorage.getItem("adminToken");
+
+      if (!token) {
+        window.location.replace("/admin");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_URL}/auth/me`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          localStorage.removeItem("adminToken");
+          window.location.replace("/admin");
+          return;
+        }
+
+        setAuthChecking(false);
+      } catch (error) {
+        console.error(
+          "Admin authentication check failed:",
+          error,
+        );
+
+        localStorage.removeItem("adminToken");
+        window.location.replace("/admin");
+      }
+    };
+
+    verifyAdmin();
+  }, [isAdminRoute]);
+
+  if (authChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#05080d] text-white">
+        <div className="text-sm text-gray-400">
+          Verifying admin access...
+        </div>
+      </div>
+    );
+  }
 
   let page;
 
@@ -43,7 +106,7 @@ function App() {
     page = <AdminExperience />;
   } else if (currentPath === "/admin/achievements") {
     page = <AdminAchievements />;
-    } else if (currentPath === "/admin/messages") {
+  } else if (currentPath === "/admin/messages") {
     page = <AdminMessages />;
   } else if (currentPath === "/admin/dashboard") {
     page = <AdminDashboard />;

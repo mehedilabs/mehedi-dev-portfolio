@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+
 import Admin from "../models/Admin.js";
 
 export const loginAdmin = async (
@@ -16,7 +17,9 @@ export const loginAdmin = async (
       });
     }
 
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({
+      email: email.trim().toLowerCase(),
+    });
 
     if (!admin) {
       return res.status(401).json({
@@ -35,9 +38,17 @@ export const loginAdmin = async (
       });
     }
 
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is missing");
+
+      return res.status(500).json({
+        message: "Authentication service is not configured",
+      });
+    }
+
     const token = jwt.sign(
-      { adminId: admin._id },
-      process.env.JWT_SECRET as string,
+      { adminId: admin._id.toString() },
+      process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
 
@@ -47,6 +58,46 @@ export const loginAdmin = async (
     });
   } catch (error) {
     console.error("Admin login failed:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+};
+
+interface AuthenticatedRequest extends Request {
+  adminId?: string;
+}
+
+export const getCurrentAdmin = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    if (!req.adminId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const admin = await Admin.findById(req.adminId).select(
+      "_id email",
+    );
+
+    if (!admin) {
+      return res.status(401).json({
+        message: "Admin account not found",
+      });
+    }
+
+    res.status(200).json({
+      admin: {
+        id: admin._id,
+        email: admin.email,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to verify admin:", error);
 
     res.status(500).json({
       message: "Something went wrong",

@@ -1,5 +1,3 @@
-import profileImage from "../assets/profile.png";
-
 export const profile = {
   name: "Mehedi Hasan",
   role: "Full-Stack Web Developer",
@@ -15,7 +13,7 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/mehedilabs/",
   whatsapp: "https://wa.me/8801877168787",
 
-  profileImage: profileImage,
+  profileImage: "",
   resume: "#",
 };
 

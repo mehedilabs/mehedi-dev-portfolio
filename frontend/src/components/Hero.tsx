@@ -13,17 +13,23 @@ import {
 
 import {
   greetings,
-  profile,
+  profile as defaultProfile,
   stats,
 } from "../data/portfolioData";
 
 import API_URL from "../config/api";
+import defaultProfileImage from "../assets/profile.png";
+
+type ProfileData = typeof defaultProfile;
 
 const Hero = () => {
   const [greetingIndex, setGreetingIndex] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
   const [experience, setExperience] = useState("00");
   const [clients, setClients] = useState("00");
+
+  const [profile, setProfile] =
+    useState<ProfileData>(defaultProfile);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,6 +39,31 @@ const Hero = () => {
     }, 2200);
 
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`${API_URL}/profile`);
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+
+        const profileData = data.profile ?? data;
+
+        setProfile((currentProfile) => ({
+          ...currentProfile,
+          ...profileData,
+        }));
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
   useEffect(() => {
@@ -131,7 +162,7 @@ const Hero = () => {
             <div className="mt-9 flex flex-wrap gap-4">
               <a
                 href="#projects"
-                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black  hover:bg-[#b2effa] transition duration-300 hover:scale-105"
+                className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-semibold text-black transition duration-300 hover:scale-105 hover:bg-[#b2effa]"
               >
                 View My Work
 
@@ -190,28 +221,15 @@ const Hero = () => {
             {/* Main profile card */}
             <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 via-white/[0.03] to-violet-500/10 p-3 shadow-2xl shadow-violet-500/10">
               <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#0b0b0d]">
-                {profile.profileImage ? (
-                  <img
-                    src={profile.profileImage}
-                    alt={profile.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center px-6 text-center">
-                    <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-white/5 text-4xl font-black text-white/80 shadow-2xl">
-                      MH
-                    </div>
-
-                    <p className="text-lg font-bold text-white">
-                      Profile Image
-                    </p>
-
-                    <p className="mt-2 max-w-xs text-sm leading-6 text-gray-500">
-                      Your profile photo can be added later from
-                      the Admin Panel.
-                    </p>
-                  </div>
-                )}
+                <img
+                  src={
+                    profile.profileImage?.trim()
+                      ? profile.profileImage
+                      : defaultProfileImage
+                  }
+                  alt={profile.name}
+                  className="h-full w-full object-cover"
+                />
 
                 {/* Image overlay */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
@@ -275,7 +293,7 @@ const Hero = () => {
             {/* Resume card */}
             <a
               href={profile.resume}
-              className="absolute -bottom-5 -right-3 hidden rounded-full  hover:bg-[#b2effa] border border-white/10 bg-white px-5 py-3 text-xs font-bold text-black shadow-xl transition duration-300 hover:scale-105 sm:block"
+              className="absolute -bottom-5 -right-3 hidden rounded-full border border-white/10 bg-white px-5 py-3 text-xs font-bold text-black shadow-xl transition duration-300 hover:scale-105 hover:bg-[#b2effa] sm:block"
             >
               Resume <FiArrowUpRight className="ml-1 inline" />
             </a>
