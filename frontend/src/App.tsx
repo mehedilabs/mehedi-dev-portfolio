@@ -22,6 +22,7 @@ import AdminProjects from "./pages/admin/AdminProjects";
 import AdminSkills from "./pages/admin/AdminSkills";
 import AdminExperience from "./pages/admin/AdminExperience";
 import AdminAchievements from "./pages/admin/AdminAchievements";
+import AdminMessages from "./pages/admin/AdminMessages";
 
 function App() {
   const currentPath = window.location.pathname;
@@ -42,6 +43,8 @@ function App() {
     page = <AdminExperience />;
   } else if (currentPath === "/admin/achievements") {
     page = <AdminAchievements />;
+    } else if (currentPath === "/admin/messages") {
+    page = <AdminMessages />;
   } else if (currentPath === "/admin/dashboard") {
     page = <AdminDashboard />;
   } else if (currentPath === "/admin") {

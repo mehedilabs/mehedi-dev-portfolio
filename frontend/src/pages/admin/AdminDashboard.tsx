@@ -334,6 +334,19 @@ const AdminDashboard = () => {
                   );
                 }
 
+                if (item.name === "Messages") {
+                  return (
+                    <a
+                      key={item.name}
+                      href="/admin/messages"
+                      className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-gray-400 transition hover:bg-white/5 hover:text-white"
+                    >
+                      <Icon size={18} />
+                      <span>{item.name}</span>
+                    </a>
+                  );
+                }
+
                 return (
                   <button
                     key={item.name}
@@ -488,6 +501,19 @@ const AdminDashboard = () => {
                       <a
                         key={item.name}
                         href="/admin/achievements"
+                        className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
+                      >
+                        <Icon size={16} />
+                        <span>{item.name}</span>
+                      </a>
+                    );
+                  }
+
+                  if (item.name === "Messages") {
+                    return (
+                      <a
+                        key={item.name}
+                        href="/admin/messages"
                         className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2.5 text-sm text-gray-400"
                       >
                         <Icon size={16} />
@@ -752,9 +778,9 @@ const AdminDashboard = () => {
                 </a>
 
                 {/* View Messages */}
-                <button
-                  type="button"
-                  className="rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                <a
+                  href="/admin/messages"
+                  className="block rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
                 >
                   <FiMail size={20} />
 
@@ -765,7 +791,7 @@ const AdminDashboard = () => {
                   <p className="mt-1 text-sm text-gray-500">
                     Check messages from visitors
                   </p>
-                </button>
+                </a>
               </div>
             </section>
           </div>
